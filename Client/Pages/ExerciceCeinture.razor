@@ -19,41 +19,50 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Opération</th>
-                <th></th>
-                <th>Résultat</th>
-            </tr>
-        </thead>
-        <tbody>
-            <EditForm Model="@model">
-
-            @foreach (var item in model.Items)
-            {
+    <EditForm Model="@model">
+        <DataAnnotationsValidator />
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@item.Expression.LeftOperand</td>
-                    <td>@switch (item.Expression.Operator)
-{
-                        case MathOperator.Add: <b>+</b> 
-                        break;
-                        case MathOperator.Divide: <b>÷</b> 
-                        break;
-                        case MathOperator.Multiply: <b>*</b> 
-                        break;
-                        case MathOperator.Subtract: <b>-</b> 
-                        break;  
-}
-                    </td>
-                    <td>@item.Expression.RightOperand</td>
-                    <td><InputText @bind-Value="item.Resultat" />  <input type="hidden" value=@item.Expression.Result /></td>
+                    <th></th>
+                    <th>Opération</th>
+                    <th></th>
+                    <th>Résultat</th>
                 </tr>
-            }
-            </EditForm>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+
+                @foreach (var item in model.Items)
+                {
+                    <tr>
+                        <td>@item.Expression.LeftOperand</td>
+                        <td>
+                            @switch (item.Expression.Operator)
+                            {
+                                case MathOperator.Add:
+                                    <b>+</b>
+                                    break;
+                                case MathOperator.Divide:
+                                    <b>÷</b>
+                                    break;
+                                case MathOperator.Multiply:
+                                    <b>*</b>
+                                    break;
+                                case MathOperator.Subtract:
+                                    <b>-</b>
+                                    break;
+                            }
+                        </td>
+                        <td>@item.Expression.RightOperand</td>
+                        <td>
+                            <InputText @bind-Value="@item.Resultat" />
+                            <input type="hidden" value=@item.Expression.Result />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </EditForm>
 }
 
 @code {
@@ -71,9 +80,10 @@ else
             //options.Converters.Add(new JsonStringEnumConverter());
             var ceinture = await Http.GetFromJsonAsync<Ceinture?>("api/ceinture?numberOfExpression=10"); //, options);
             if (ceinture == null) model = null;
-            else {
+            else
+            {
                 model = new ResultModel(ceinture);
-            }            
+            }
         }
         catch (Exception ex)
         {
