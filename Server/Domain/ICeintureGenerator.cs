@@ -13,19 +13,26 @@ namespace GenerateurCeinture.Server.Domain
         public Ceinture? Generate(GenerateCeintureRequest request)
         {
             if (request == null) return null;
-            if (request.NumberOfExpressions <= 0) return null;
+            if ((request.CeintureRequest.NumberOfExpressions ?? 0) <= 0) return null;
 
 
-            return new Ceinture(GenerateExpression(request.NumberOfExpressions).ToList());
+            return new Ceinture(GenerateExpression(request.CeintureRequest).ToList());
         }
 
-        private IEnumerable<MathExpression> GenerateExpression(int numberOfExpressions)
+        private IEnumerable<MathExpression> GenerateExpression(CeintureRequestModel ceintureRequest)
         {
+            var allowedOperators = new List<MathOperator>();
+            if (ceintureRequest.GenerateAddition) allowedOperators.Add(MathOperator.Add);
+            if (ceintureRequest.GenerateSubstraction) allowedOperators.Add(MathOperator.Subtract);
+            if (ceintureRequest.GenerateMultiplication) allowedOperators.Add(MathOperator.Multiply);
+            if (ceintureRequest.GenerateDivision) allowedOperators.Add(MathOperator.Divide);
+
             var random = new Random();
-            for(var i = 0; i < numberOfExpressions; i++)
+            var countOperators = allowedOperators.Count;
+            for (var i = 0; i < ceintureRequest.NumberOfExpressions; i++)
             {
-                var @operator = (MathOperator)random.Next(4); // TODO add only operator requested
-                var leftOperand = random.Next(11); // TODO add as param
+                var @operator = allowedOperators[random.Next(countOperators)];                
+                var leftOperand = random.Next(1, 11); // TODO add as param
                 var rightOperand = random.Next(@operator == MathOperator.Divide ? 1 : 0, 11);
 
                 //TODO retry if already in returned operations for Add and Mul

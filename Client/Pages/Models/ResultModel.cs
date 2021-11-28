@@ -1,4 +1,5 @@
 ﻿using GenerateurCeinture.Shared;
+using System.ComponentModel.DataAnnotations;
 
 namespace GenerateurCeinture.Client.Pages.Models
 {
@@ -20,6 +21,9 @@ namespace GenerateurCeinture.Client.Pages.Models
 
         public MathExpression Expression { get; }
 
-        public string Resultat { get; set; }
+        public int ResultatAttendu => Expression.Result;
+
+        [Compare("ResultatAttendu", ErrorMessage = "Mauvais résultat")]
+        public int? Resultat { get; set; }
     }
 }

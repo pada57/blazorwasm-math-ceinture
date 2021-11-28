@@ -1,9 +1,10 @@
-﻿@page "/ceinture"
-@using GenerateurCeinture.Client.Pages.Models
+﻿@page "/"
 @using GenerateurCeinture.Shared
+@using GenerateurCeinture.Client.Pages.Models
 @using Microsoft.Extensions.Logging
 @using System.Text.Json
 @using System.Text.Json.Serialization
+@using System.Timers
 @inject HttpClient Http
 @inject ILogger<ExerciceCeinture> Logger
 
@@ -13,14 +14,64 @@
 
 <p>Exercez-vous aux ceintures de Math.</p>
 
-@if (model == null)
-{
-    <p><em>Chargement...</em></p>
-}
-else
-{
-    <EditForm Model="@model">
-        <DataAnnotationsValidator />
+
+<EditForm Model="@request" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <p>
+        <label>
+            Nombre de calculs :
+        </label>
+        <InputNumber @bind-Value="request.NumberOfExpressions"
+                     ParsingErrorMessage="Le champs {0} doit être un entier." />
+    </p>
+    <p>
+        <label>
+            Addition :
+        </label>
+        <InputCheckbox @bind-Value="request.GenerateAddition" />
+    </p>
+    <p>
+        <label>
+            Soustraction :
+        </label>
+        <InputCheckbox @bind-Value="request.GenerateSubstraction" />
+    </p>
+    <p>
+        <label>
+            Multiplication :
+        </label>
+        <InputCheckbox @bind-Value="request.GenerateMultiplication" />
+    </p>
+    <p>
+        <label>
+            Division :
+        </label>
+        <InputCheckbox @bind-Value="request.GenerateDivision" />
+    </p>
+    <br />
+    <p>
+        <label>
+            Temps :
+        </label>
+        <InputNumber @bind-Value="request.Temps" style="width:40px"  />
+        min
+    </p>
+    <button type="submit">Nouvelle</button>
+</EditForm>
+<EditForm Model="@model" >
+    @if (model == null)
+    {
+        <p><em>Chargement...</em></p>
+    }
+    else
+    {
+        <p>
+            <label>
+                Temps Restant :  @(counter > 0 ? @counter + "s" : "écoulé !")
+            </label>
+        </p>
         <table class="table">
             <thead>
                 <tr>
@@ -55,40 +106,92 @@ else
                         </td>
                         <td>@item.Expression.RightOperand</td>
                         <td>
-                            <InputText @bind-Value="@item.Resultat" />
+                            <InputNumber @bind-Value="@item.Resultat" />
                             <input type="hidden" value=@item.Expression.Result />
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-    </EditForm>
-}
+    }
+
+</EditForm>
 
 @code {
-    private ResultModel model;
-    private string testBinding;
+    private ResultModel? model;
+    private CeintureRequestModel request = new();
+    private EditContext? editContext;
+    private Timer timer;
+    private int counter;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
+        request.GenerateMultiplication = true;
+        request.NumberOfExpressions = 20;
+        request.Temps = 1;
+
+        timer = new System.Timers.Timer();
+        timer.Interval = 1000;
+        timer.Elapsed += CountdownTimer;
+
         //#if DEBUG
         //        Thread.Sleep(1000);
         //#endif
+
+        //var options = new JsonSerializerOptions();
+        //options.Converters.Add(new JsonStringEnumConverter());
+
+    }
+
+    private async Task<ResultModel?> GenerateNewCeinture(CeintureRequestModel request)
+    {
+        Ceinture? ceinture = null;
         try
         {
-            //var options = new JsonSerializerOptions();
-            //options.Converters.Add(new JsonStringEnumConverter());
-            var ceinture = await Http.GetFromJsonAsync<Ceinture?>("api/ceinture?numberOfExpression=10"); //, options);
-            if (ceinture == null) model = null;
-            else
-            {
-                model = new ResultModel(ceinture);
-            }
+            var kvp = new Dictionary<string, string> {
+                { nameof(request.NumberOfExpressions) , (request.NumberOfExpressions ?? 0).ToString() },
+                { nameof(request.GenerateAddition) , request.GenerateAddition.ToString() },
+                { nameof(request.GenerateDivision) , request.GenerateDivision.ToString() },
+                { nameof(request.GenerateMultiplication) , request.GenerateMultiplication.ToString() },
+                { nameof(request.GenerateSubstraction) , request.GenerateSubstraction.ToString() },
+                { nameof(request.Temps) , (request.Temps ?? 0).ToString() },
+              };
+
+            var uriRequest = string.Join("&",
+                    kvp.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+            ceinture = await Http.GetFromJsonAsync<Ceinture?>(string.Format("api/ceinture?{0}", uriRequest));
         }
         catch (Exception ex)
         {
-            model = null;
             Logger.LogError(ex, "Failed to load ceinture");
+        }
+
+        if (ceinture == null) return null;
+
+        return new ResultModel(ceinture);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        model = await GenerateNewCeinture(request);
+
+        counter = (request.Temps ?? 1) * 60;
+
+        timer.Start();
+
+    }
+
+    private void CountdownTimer(object source, ElapsedEventArgs e)
+    {
+        if (counter > 0)
+        {
+            counter--;
+            editContext.Validate();
+            InvokeAsync(StateHasChanged);            
+        }
+        else
+        {
+            timer.Stop();
         }
     }
 }

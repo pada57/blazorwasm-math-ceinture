@@ -3,7 +3,7 @@ using MediatR;
 
 namespace GenerateurCeinture.Server.Domain
 {
-    public record GenerateCeintureRequest(int NumberOfExpressions) : IRequest<Ceinture?>
+    public record GenerateCeintureRequest(CeintureRequestModel CeintureRequest) : IRequest<Ceinture?>
     {
 
         //TODO add allowed Operators etc...

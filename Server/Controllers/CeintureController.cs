@@ -18,9 +18,9 @@ namespace GenerateurCeinture.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<Ceinture?> GenerateCeinture([FromQuery] int? numberOfExpression)
+        public async Task<Ceinture?> GenerateCeinture([FromQuery] CeintureRequestModel ceintureRequest)
         {
-            var response = await mediator.Send(new GenerateCeintureRequest(numberOfExpression ?? 20));
+            var response = await mediator.Send(new GenerateCeintureRequest(ceintureRequest));
             return response;
         }
     }
