@@ -12,6 +12,7 @@ namespace GenerateurCeinture.Client.Pages.Models
             items = ceinture.MathExpressions.Select(exp => new ResultItem(exp)).ToList();
         }
 
+        //[ValidateComplexType]
         public IEnumerable<ResultItem> Items => items.AsReadOnly();
     }
 
@@ -23,7 +24,7 @@ namespace GenerateurCeinture.Client.Pages.Models
 
         public int ResultatAttendu => Expression.Result;
 
-        [Compare("ResultatAttendu", ErrorMessage = "Mauvais résultat")]
+        //[Compare("ResultatAttendu", ErrorMessage = "Mauvais résultat")]
         public int? Resultat { get; set; }
     }
 }

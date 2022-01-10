@@ -55,22 +55,30 @@
         <label>
             Temps :
         </label>
-        <InputNumber @bind-Value="request.Temps" style="width:40px"  />
+        <InputNumber @bind-Value="request.Temps" style="width:40px" />
         min
     </p>
     <button type="submit">Nouvelle</button>
 </EditForm>
-<EditForm Model="@model" >
-    @if (model == null)
-    {
-        <p><em>Chargement...</em></p>
-    }
-    else
-    {
+@if (model == null)
+{
+    <p><em>Chargement...</em></p>
+}
+else
+{
+    <EditForm EditContext="@editContext" OnValidSubmit="@HandleResultatsValidSubmit">
+        @*<ObjectGraphDataAnnotationsValidator />*@
+        <CustomValidation @ref="customValidation" />    
+        <ValidationSummary />
         <p>
             <label>
                 Temps Restant :  @(counter > 0 ? @counter + "s" : "écoulé !")
             </label>
+            @if (goodAnswers == request.NumberOfExpressions) {                
+                <label>
+                    Bravo !!!
+                </label>
+            }
         </p>
         <table class="table">
             <thead>
@@ -106,16 +114,16 @@
                         </td>
                         <td>@item.Expression.RightOperand</td>
                         <td>
-                            <InputNumber @bind-Value="@item.Resultat" />
-                            <input type="hidden" value=@item.Expression.Result />
+                            <InputNumber @bind-Value="@item.Resultat" disabled="@IsFinished" />
+                            @*<InputNumberOnInput @bind-Value="@item.Resultat" />*@
+                            <ValidationMessage For="@(() => item.Resultat)" />
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-    }
-
-</EditForm>
+    </EditForm>
+}
 
 @code {
     private ResultModel? model;
@@ -123,6 +131,10 @@
     private EditContext? editContext;
     private Timer timer;
     private int counter;
+    private CustomValidation customValidation;
+    private int? goodAnswers;
+
+    private bool IsFinished => counter <= 0;
 
     protected override void OnInitialized()
     {
@@ -174,6 +186,11 @@
     private async Task HandleValidSubmit()
     {
         model = await GenerateNewCeinture(request);
+        if (model is null) return;
+
+        editContext = new(model);
+        editContext.OnFieldChanged += (sender, eventArgs) => { };
+        goodAnswers = null;
 
         counter = (request.Temps ?? 1) * 60;
 
@@ -181,17 +198,50 @@
 
     }
 
+    private void HandleResultatsValidSubmit()
+    {
+        customValidation?.ClearErrors();
+
+        var errors = new Dictionary<string, List<string>>();
+
+        goodAnswers = model?.Items.Count(o => o.Resultat == o.ResultatAttendu);
+
+        if (goodAnswers != request.NumberOfExpressions)
+        {
+            errors.Add(nameof(ResultItem.Resultat),
+                new() { $"{request.NumberOfExpressions - goodAnswers} erreurs"});
+        }
+
+        if (errors.Any())
+        {
+            customValidation?.DisplayErrors(errors);
+        }
+    }
+
+    private void HandleResultatChanged(string value)
+    {
+        var here = value;
+    }
+
     private void CountdownTimer(object source, ElapsedEventArgs e)
     {
         if (counter > 0)
         {
             counter--;
-            editContext.Validate();
-            InvokeAsync(StateHasChanged);            
         }
         else
         {
             timer.Stop();
+            if (editContext?.Validate() ?? false) {
+                HandleResultatsValidSubmit();
+
+            }
+            else {
+                throw new Exception("should not happen");
+            }
+            
         }
+
+        InvokeAsync(StateHasChanged).GetAwaiter().GetResult();
     }
 }

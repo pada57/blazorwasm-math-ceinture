@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateurCeinture.Server", "Server\GenerateurCeinture.Server.csproj", "{8A3B50CC-E0E8-4A1C-AE32-F2F491EC67E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateurCeinture.Server", "Server\GenerateurCeinture.Server.csproj", "{8A3B50CC-E0E8-4A1C-AE32-F2F491EC67E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateurCeinture.Client", "Client\GenerateurCeinture.Client.csproj", "{327771AB-5F16-4F7E-B4F6-506D592F9BFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateurCeinture.Client", "Client\GenerateurCeinture.Client.csproj", "{327771AB-5F16-4F7E-B4F6-506D592F9BFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateurCeinture.Shared", "Shared\GenerateurCeinture.Shared.csproj", "{2715081D-DD4B-461A-BC59-68409D8668AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenerateurCeinture.Shared", "Shared\GenerateurCeinture.Shared.csproj", "{2715081D-DD4B-461A-BC59-68409D8668AE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D002E60-6794-46DF-8BAF-4741F9973BE5}"
 	ProjectSection(SolutionItems) = preProject
