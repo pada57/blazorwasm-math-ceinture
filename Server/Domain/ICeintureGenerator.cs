@@ -31,9 +31,13 @@ namespace GenerateurCeinture.Server.Domain
             var countOperators = allowedOperators.Count;
             for (var i = 0; i < ceintureRequest.NumberOfExpressions; i++)
             {
-                var @operator = allowedOperators[random.Next(countOperators)];                
-                var leftOperand = random.Next(1, 11); // TODO add as param
+                var @operator = allowedOperators[random.Next(countOperators)];                    
+                var leftOperand = @operator != MathOperator.Divide ? random.Next(1, 11) : random.Next(1,101); // TODO add as param
                 var rightOperand = random.Next(@operator == MathOperator.Divide ? 1 : 0, 11);
+
+                if (@operator == MathOperator.Divide && leftOperand < rightOperand) {
+                    (leftOperand, rightOperand) = (rightOperand, leftOperand);
+                }
 
                 //TODO retry if already in returned operations for Add and Mul
 
