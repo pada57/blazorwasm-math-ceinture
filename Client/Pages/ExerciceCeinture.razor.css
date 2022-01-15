@@ -7,17 +7,13 @@ form button {
 }
 
 table {
-    width: 600px;
+    width: 250px;
     margin: 10px;
 }
 
 th,
 td {
     border: 1px solid black;
-    width: 150px;
+    width: 120px;
     overflow: hidden;
-}
-
-.smallNumber {
-    width: 100px;
 }

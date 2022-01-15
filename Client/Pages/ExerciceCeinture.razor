@@ -26,27 +26,33 @@
         <InputNumber @bind-Value="request.NumberOfExpressions"
                      ParsingErrorMessage="Le champs {0} doit être un entier." />
     </p>
+    <br />
     <p>
         <label>
-            Addition :
+            Opérations :
+        </label>
+   </p>
+    <p>
+        <label>
+            Addition
         </label>
         <InputCheckbox @bind-Value="request.GenerateAddition" />
     </p>
     <p>
         <label>
-            Soustraction :
+            Soustraction
         </label>
         <InputCheckbox @bind-Value="request.GenerateSubstraction" />
     </p>
     <p>
         <label>
-            Multiplication :
+            Multiplication
         </label>
         <InputCheckbox @bind-Value="request.GenerateMultiplication" />
     </p>
     <p>
         <label>
-            Division :
+            Division
         </label>
         <InputCheckbox @bind-Value="request.GenerateDivision" />
     </p>
@@ -83,9 +89,7 @@ else
         <table class="table">
             <thead>
                 <tr>
-                    <th></th>
                     <th>Opération</th>
-                    <th></th>
                     <th>Résultat</th>
                 </tr>
             </thead>
@@ -94,25 +98,11 @@ else
                 @foreach (var item in model.Items)
                 {
                     <tr>
-                        <td>@item.Expression.LeftOperand</td>
-                        <td>
-                            @switch (item.Expression.Operator)
-                            {
-                                case MathOperator.Add:
-                                    <b>+</b>
-                                    break;
-                                case MathOperator.Divide:
-                                    <b>÷</b>
-                                    break;
-                                case MathOperator.Multiply:
-                                    <b>*</b>
-                                    break;
-                                case MathOperator.Subtract:
-                                    <b>-</b>
-                                    break;
-                            }
+                        <td align="right">@item.Expression.LeftOperand
+                                <b>@item.Expression.Operator.ToDisplay()</b>
+                            @item.Expression.RightOperand
+                            =
                         </td>
-                        <td>@item.Expression.RightOperand</td>
                         <td>
                             <InputNumber @bind-Value="@item.Resultat" disabled="@IsFinished" />
                             @*<InputNumberOnInput @bind-Value="@item.Resultat" />*@
@@ -210,6 +200,12 @@ else
         {
             errors.Add(nameof(ResultItem.Resultat),
                 new() { $"{request.NumberOfExpressions - goodAnswers} erreurs"});
+
+            foreach (var badAnswer in model?.Items.Where(o => o.Resultat != o.ResultatAttendu).Select((Answer, i) => new { Answer, i})) {
+                errors.Add($"{nameof(ResultItem.Resultat)}-{badAnswer.i}",
+                new() { $"{badAnswer.Answer.Expression} au lieu de {badAnswer.Answer.Resultat}" });
+            }
+
         }
 
         if (errors.Any())

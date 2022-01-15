@@ -6,6 +6,7 @@ namespace GenerateurCeinture.Client.Pages.Models
     public class ResultModel
     {
         private readonly List<ResultItem> items;
+        private readonly List<string> errors = new();
 
         public ResultModel(Ceinture ceinture)
         {
@@ -14,6 +15,14 @@ namespace GenerateurCeinture.Client.Pages.Models
 
         //[ValidateComplexType]
         public IEnumerable<ResultItem> Items => items.AsReadOnly();
+
+        public IEnumerable<string> Errors => errors.AsReadOnly();
+
+
+        public ResultModel AddError(string error) {
+            errors.Add(error);
+            return this;
+        }
     }
 
     public class ResultItem
