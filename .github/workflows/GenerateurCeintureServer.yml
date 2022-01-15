@@ -1,4 +1,5 @@
 name: Build and deploy .NET Core application to Web App GenerateurCeintureServer
+on: [push]
 env:
   AZURE_WEBAPP_NAME: GenerateurCeintureServer
   AZURE_WEBAPP_PACKAGE_PATH: Server/published
