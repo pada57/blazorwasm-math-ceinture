@@ -1,7 +1,7 @@
 name: Build and deploy .NET Core application to Web App GenerateurCeintureServer
 on: [push]
 env:
-  AZURE_WEBAPP_NAME: GenerateurCeintureServer
+  AZURE_WEBAPP_NAME: CeintureMaths
   AZURE_WEBAPP_PACKAGE_PATH: Server/published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 6.0.x
